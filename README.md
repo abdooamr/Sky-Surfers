@@ -27,7 +27,7 @@ This project showcases the use of Three.js to build a basic 3D game environment.
 1. Clone the repository to your local machine:
 
     ```bash
-    git clone xx
+    git clone https://github.com/abdooamr/Sky-Surfers
     ```
 
 2. Open the `index.html` file in a web browser that supports WebGL.
