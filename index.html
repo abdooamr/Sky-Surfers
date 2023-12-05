@@ -1,0 +1,243 @@
+<!-- My scene -->
+/*<style>
+    *
+    {
+        margin: 0;    
+    }
+    #score {
+			position: absolute;
+			color: white;
+			top: 50px;
+            margin-left:150px;
+		}
+</style>
+<canvas id="scene"></canvas>
+<body>
+     
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>
+<!--<script src="./Animation_files/OrbitControls.js.download"></script>-->
+<h1 id="score">Score: </h5>
+<script>
+    //Get the height and the width of the window
+    var ww = window.innerWidth,
+        wh = window.innerHeight;
+  
+    var lastobst=false;
+    var score=0;
+
+    function StartGame() 
+    {
+        /* WEBGL RENDERER */
+
+        //Create the webGl renderer from Three
+        renderer = new THREE.WebGLRenderer({canvas: document.getElementById('scene')});
+        //Set the background of our scene
+        renderer.setClearColor(0x0000000);
+        //Set the size of my renderer, I want it to be fullscreen
+        renderer.setSize(ww, wh);
+
+        /* SCENE */
+
+
+        //Create my scene
+        scene = new THREE.Scene();
+
+        /* CAMERA */
+
+        //Create a new Perspective Camera with four parameters
+    
+        camera = new THREE.PerspectiveCamera(100, ww / wh, 1, 100000);
+        //We set our camera at x:0,y:0 and z:500
+        camera.position.set(0,500,0);
+        camera.lookAt(0, 550, 0);
+        //And finally we add our camera in our scene
+        scene.add(camera);
+
+        /* LIGHT */
+
+        //Create a white 'directional light'
+
+        light = new THREE.DirectionalLight(0xffffff, 1);
+
+        // position of our light
+        light.position.set(0, 10000, 400);
+
+        //add our light into the scene
+        scene.add(light);
+        
+
+
+        // render our scene
+        renderer.render(scene, camera);
+        window.addEventListener("keydown", moveObj);
+    
+        //Create a variable that contains the time when the animation start
+        previousTime = Date.now();
+        createsphere();
+        //Start the animation of the scene
+        animate();
+        //Create our path
+        createpath();
+    };
+
+    function createBox() 
+    {
+        /* The board */
+        // new THREE.BoxGeometry(width, hight, z);
+        var geometry = new THREE.BoxGeometry(1050, 100, 1000000);
+        var texture = new THREE.TextureLoader().load('MetalBox - Copy.png');
+        var material = new THREE.MeshBasicMaterial({map: texture});
+        var cube = new THREE.Mesh(geometry,  material);
+        scene.add(cube);
+    
+    }
+
+    function createsphere()
+    {
+        //charcter
+        var geometry = new THREE.SphereGeometry(50, 52, 52);
+        var texture = new THREE.TextureLoader().load('Ball.png');
+        var material = new THREE.MeshBasicMaterial({map: texture});
+        hero = new THREE.Mesh(geometry, material);
+        hero.position.y = 150;
+        hero.position.z = -1000;
+        hero.name="sphere";
+        
+        scene.add(hero);  
+        
+
+        
+    }
+    
+    
+    function createpath() 
+    {
+        //right side
+        geometry = new THREE.BoxGeometry(500, 100, 1000000);
+        var texture = new THREE.TextureLoader().load('watrer.jpg');
+        var material = new THREE.MeshBasicMaterial({map: texture});
+        rightside = new THREE.Mesh(geometry, material);
+        rightside.position.x = 790;
+        rightside.position.y = 100;
+        rightside.position.z = 150;
+        scene.add(rightside);
+
+
+        //Left side
+        geometry = new THREE.BoxGeometry(500, 100, 1000000);
+        var texture = new THREE.TextureLoader().load('watrer.jpg');
+        var material = new THREE.MeshBasicMaterial({map: texture});
+        leftside = new THREE.Mesh(geometry, material);
+        leftside.position.x = -790;
+        leftside.position.y = 100;
+        leftside.position.z = 150;
+        scene.add(leftside);
+
+        createBox();
+        createrandomcubes();
+        createstars();
+    }
+
+
+    function createrandomcubes()
+    {
+        //create random vubes in the plane
+        cubes = new THREE.Object3D();
+        geometry = new THREE.BoxGeometry(142, 142,142);
+        var texture = new THREE.TextureLoader().load('MetalBox.png');
+        var material = new THREE.MeshLambertMaterial({
+            map: texture
+        });
+        //Generate 5000 random cubes
+        for (var i = 0; i < 5000; i++) {
+            cube = new THREE.Mesh(geometry, material);
+            if(i%2==0)
+            {
+                cube.position.x =  250;
+            cube.position.y = 150;
+            cube.position.z = -(i*400)-200;
+          
+            }
+            if(i%3==0)
+            {
+            cube.position.x = -250;
+            cube.position.y =  150;
+            cube.position.z = -(i*400)-200;
+            }
+          
+        if(i%5==0)
+            {
+            cube.position.x = 0;
+            cube.position.y =  150;
+            cube.position.z = -(i*400)-200;
+            }
+            cubes.add(cube);
+        }
+        scene.add(cubes);
+        
+    }
+
+
+   function createstars()
+    {
+        //stars
+        var starsGeometry = new THREE.Geometry();
+        for (var i = 0; i < 10000; i++) 
+        {
+            var star = new THREE.Vector3();
+            star.x = THREE.Math.randFloatSpread(500000);
+            star.y = THREE.Math.randFloatSpread(500000);
+            star.z = THREE.Math.randFloatSpread(500000);
+            starsGeometry.vertices.push(star);
+        }
+
+        var starsMaterial = new THREE.PointsMaterial({color: 0xff0000});
+        var starField = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starField);
+        //BACKGROUND
+
+     
+    }
+
+    
+
+
+      
+    
+    var animate = function() 
+    {
+        //Request another frame of the animation
+        requestAnimationFrame(animate);
+        hero.position.z -= 50;
+        camera.position.z -=50;
+        hero.rotation.x +=Math.PI*0.05   ;
+            score+=1;
+            document.getElementById("score").innerHTML = "Score: "+score;
+               //Render the scene
+        renderer.render(scene, camera);
+    };
+
+    var moveObj = function(event) 
+    {
+        var key = event.key.toUpperCase();
+        if (key == "D") 
+        {
+            hero.position.x += 100;
+        
+        }
+        if (key == "A") 
+        {
+            hero.position.x -= 100;
+         
+				
+            
+        }
+
+    }
+
+
+    //Init our scene
+    StartGame();
+</script>
